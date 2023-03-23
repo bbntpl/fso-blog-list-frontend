@@ -1,22 +1,22 @@
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { createBlog } from '../reducers/blogSlice';
 
-const BlogForm = ({
-	updateBlogs,
-	createBlog,
-}) => {
+const BlogForm = ({ toggleBlogFormVisibility }) => {
 	const initBlog = {
 		title: '',
 		author: '',
 		url: ''
 	}
+	const dispatch = useDispatch()
 	const [blog, setBlog] = useState(initBlog)
 
 	const handleSubmit = (event) => {
 		event.preventDefault();
-		createBlog(blog)
+		dispatch(createBlog(blog))
 
+		toggleBlogFormVisibility();
 		setBlog({ ...initBlog });
-		updateBlogs();
 	}
 
 	const handleChange = (key) => (event) => {

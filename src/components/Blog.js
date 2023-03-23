@@ -1,6 +1,11 @@
 import { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { updateBlog, deleteBlog } from '../reducers/blogSlice'
 
-const Blog = ({ blog, updateBlog, deleteBlog, isBlogOwnedByUser }) => {
+const Blog = ({ blog }) => {
+	const user = useSelector(state => state.user)
+	const dispatch = useDispatch()
+
 	const [showBlogDetails, setShowBlogDetails] = useState(false)
 	const blogStyle = {
 		paddingTop: 10,
@@ -18,11 +23,15 @@ const Blog = ({ blog, updateBlog, deleteBlog, isBlogOwnedByUser }) => {
 		margin: '2px 1px'
 	}
 
+	const isBlogOwnedByUser = (username) => {
+		return user.username === username
+	}
+
 	const handleIncrementLikes = () => {
-		updateBlog(blog.id, {
+		dispatch(updateBlog(blog.id, {
 			...blog,
 			likes: blog.likes + 1
-		})
+		}))
 	}
 
 	const toggleBlogDetails = () => {
@@ -31,7 +40,7 @@ const Blog = ({ blog, updateBlog, deleteBlog, isBlogOwnedByUser }) => {
 
 	const handleDeletion = () => {
 		if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
-			deleteBlog(blog.id, blog)
+			dispatch(deleteBlog(blog.id, blog))
 		}
 	}
 
