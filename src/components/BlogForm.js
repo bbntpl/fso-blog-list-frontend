@@ -1,3 +1,4 @@
+import { Button, TextField } from '@mui/material';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { createBlog } from '../reducers/blogSlice';
@@ -29,10 +30,12 @@ const BlogForm = ({ toggleBlogFormVisibility }) => {
 	return (
 		<div data-testid='blog-form-wrapper'>
 			<h1>create new blog</h1>
-			<form onSubmit={handleSubmit}>
+			<form onSubmit={handleSubmit} id='blog-form'>
 				<div>
-					title:
-					<input
+					<TextField
+						required
+						label="Title"
+						variant="filled"
 						id='blog-title-input'
 						type="title"
 						value={blog.title}
@@ -41,8 +44,10 @@ const BlogForm = ({ toggleBlogFormVisibility }) => {
 					/>
 				</div>
 				<div>
-					author:
-					<input
+					<TextField
+						required
+						label="Author"
+						variant="filled"
 						id='blog-author-input'
 						type="text"
 						value={blog.author}
@@ -51,8 +56,10 @@ const BlogForm = ({ toggleBlogFormVisibility }) => {
 					/>
 				</div>
 				<div>
-					url:
-					<input
+					<TextField
+						required
+						label="URL"
+						variant="filled"
 						id='blog-url-input'
 						type="text"
 						value={blog.url}
@@ -60,7 +67,12 @@ const BlogForm = ({ toggleBlogFormVisibility }) => {
 						onChange={handleChange('url')}
 					/>
 				</div>
-				<button id='blog-submit-btn' type="submit">create</button>
+				<Button
+					color='secondary'
+					id='blog-submit-btn'
+					type="submit"
+					variant='contained'
+				>create</Button>
 			</form>
 		</div>
 	)

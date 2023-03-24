@@ -6,8 +6,14 @@ const getUser = async (id) => {
 	return response.data
 }
 
+const getAllUsers = async () => {
+	const response = await axios.get(baseUrl)
+	return response.data
+}
+
 const userService = {
-	getUser
+	getUser,
+	getAllUsers
 }
 
 export default userService

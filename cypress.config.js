@@ -8,7 +8,8 @@ module.exports = defineConfig({
 			// implement node event listeners here
 		},
 		baseUrl: 'http://localhost:3000',
-		video: false
+		video: false,
+		screenshots: false
 	},
 	env: {
 		BACKEND: 'http://localhost:3003/api'

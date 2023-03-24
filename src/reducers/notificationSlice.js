@@ -28,7 +28,6 @@ export const notifyUser = (message, type = 'error') => {
 		const notificationWithoutId = {
 			message, type
 		}
-		console.log(notificationWithoutId)
 		const id = generateId()
 		dispatch(setNotification({ ...notificationWithoutId, id }))
 		setTimeout(() => {

@@ -1,104 +1,76 @@
-import { useState, useEffect, useRef } from 'react'
+import { Route, Routes } from 'react-router-dom';
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
 
 import Login from './components/Login';
-import Blogs from './components/Blogs';
-import UserDetails from './components/UserDetails';
-import BlogForm from './components/BlogForm';
 import Notification from './components/Notification';
+import Users from './components/Users';
+import UserBlogList from './components/UserBlogList';
+import Blog from './components/Blog';
+import CommentSection from './components/CommentSection';
+import BlogPage from './views/BlogPage';
 
-import Togglable from './lib/Togglable';
-import {
-	notifyUser,
-} from './reducers/notificationSlice';
 import {
 	initializeBlogs,
 } from './reducers/blogSlice';
-import { useDispatch, useSelector } from 'react-redux';
 import {
 	initializeUser,
-	submitUserCredentials
-} from './reducers/userSlice';
-import loginService from './services/login';
+} from './reducers/loggedUserSlice';
+import { initializeUsers } from './reducers/usersSlice';
+import NavMenu from './components/Menu';
+import { Box, Container } from '@mui/material';
 
 const App = () => {
-	const blogFormRef = useRef()
 	const user = useSelector(state => state.user)
 	const dispatch = useDispatch()
-	const [username, setUsername] = useState('');
-	const [password, setPassword] = useState('');
 
-	const toggleBlogFormVisibility = () => {
-		blogFormRef.current.toggleVisibility();
-	}
+	useEffect(() => {
+		dispatch(initializeUser())
+		dispatch(initializeUsers())
+	}, [])
 
 	useEffect(() => {
 		dispatch(initializeBlogs())
 	}, [dispatch])
 
-	useEffect(() => {
-		dispatch(initializeUser())
-	}, [])
-
-	const handleLogin = async (event) => {
-		event.preventDefault()
-		try {
-			const user = await loginService.login({
-				username,
-				password
-			})
-			dispatch(submitUserCredentials(user))
-			setUsername('');
-			setPassword('');
-		} catch (exception) {
-			dispatch(notifyUser(
-				exception.response.data.error || 'Wrong username of password'
-			));
-		}
-	}
-
-	const loginHandlers = {
-		submitUserCredentials: handleLogin,
-		changeUsername: ({ target }) => {
-			const usernameInput = target.value
-			setUsername(usernameInput);
-		},
-		changePassword: ({ target }) => {
-			const pwdInput = target.value
-			setPassword(pwdInput);
-		}
-	}
-
 	return (
-		<>
-			<h1>
-				{
-					user === null
-						? 'log in to application'
-						: 'blogs'
-				}
-			</h1>
+		<Container maxWidth='sm'>
+			<NavMenu />
 			<Notification />
-			<div>
+			<Box component="main">
 				{
 					user === null
-						? <Login
-							loginHandlers={loginHandlers}
-							username={username}
-							password={password}
-						/>
-						: <div>
-							<UserDetails />
-							<Togglable
-								buttonLabel='create new blog'
-								ref={blogFormRef}
-							>
-								<BlogForm toggleBlogFormVisibility={toggleBlogFormVisibility} />
-							</Togglable>
-							<Blogs />
-						</div>
+						? <Login />
+						:
+						<Routes>
+							<Route
+								path={'/blogs/:id'}
+								element={<>
+									<Blog />
+									<CommentSection />
+								</>}
+							/>
+							<Route
+								path={'/users/:id'}
+								element={<UserBlogList />}
+							/>
+							<Route
+								path={'/users'}
+								element={<Users />}
+							/>
+							{
+								['/blogs', '/'].map(p => (
+									<Route
+										key={p}
+										path={p}
+										element={<BlogPage />}
+									/>
+								))
+							}
+						</Routes>
 				}
-			</div>
-		</>
+			</Box>
+		</Container>
 	)
 }
 

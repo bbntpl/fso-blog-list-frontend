@@ -9,12 +9,24 @@ const blogSlice = createSlice({
 		addBlog(state, action) {
 			return state.concat(action.payload)
 		},
+		addComment(state, action) {
+			const { id, comment } = action.payload
+			return state.map(o => {
+				if (id === o.id) {
+					return {
+						...o,
+						comments: o.comments.concat(comment)
+					}
+				}
+				return o
+			})
+		},
 		removeBlog(state, action) {
 			const id = action.payload
 			return state.filter(blog => blog.id !== id)
 		},
 		likeBlog(state, action) {
-			const id = action.payload
+			const id = action.payload.id
 			return state.map(blog => {
 				if (blog.id === id) {
 					return {
@@ -33,6 +45,7 @@ const blogSlice = createSlice({
 
 export const {
 	addBlog,
+	addComment,
 	removeBlog,
 	likeBlog,
 	setBlogs
@@ -60,11 +73,13 @@ export const createBlog = (newBlog) => {
 		));
 	}
 }
-export const updateBlog = (id, updatedBlog) => {
+
+export const updateBlog = ({ id, requestedData, callback, options }) => {
+	const { relativePath = '', ...params } = options
 	return dispatch => {
-		blogService.update(id, updatedBlog)
+		blogService.update(id, requestedData, relativePath)
 			.then(() => {
-				dispatch(likeBlog(id))
+				dispatch(callback(params))
 			})
 			.catch(exceptions => {
 				dispatch(notifyUser(exceptions.response.data.error || exceptions.message))

@@ -1,19 +1,15 @@
-import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { updateBlog, deleteBlog } from '../reducers/blogSlice'
+import { useMatch, useParams } from 'react-router-dom'
+import { deleteBlog, likeBlog, updateBlog } from '../reducers/blogSlice'
 
-const Blog = ({ blog }) => {
-	const user = useSelector(state => state.user)
+const Blog = () => {
+	const match = useMatch('blogs/:id')
+	const { id } = useParams()
 	const dispatch = useDispatch()
-
-	const [showBlogDetails, setShowBlogDetails] = useState(false)
-	const blogStyle = {
-		paddingTop: 10,
-		paddingLeft: 2,
-		border: 'solid',
-		borderWidth: 1,
-		marginBottom: 5
-	}
+	const user = useSelector(state => state.user)
+	const blog = match
+		? useSelector(state => state.blogs.find(blog => blog.id === id))
+		: null
 
 	const deleteButtonStyle = {
 		backgroundColor: 'lightblue',
@@ -28,14 +24,16 @@ const Blog = ({ blog }) => {
 	}
 
 	const handleIncrementLikes = () => {
-		dispatch(updateBlog(blog.id, {
-			...blog,
-			likes: blog.likes + 1
-		}))
-	}
-
-	const toggleBlogDetails = () => {
-		setShowBlogDetails(!showBlogDetails)
+		const updateBlogParams = {
+			id: blog.id,
+			requestedData: {
+				...blog,
+				likes: blog.likes + 1
+			},
+			callback: likeBlog,
+			options: { id: blog.id }
+		}
+		dispatch(updateBlog(updateBlogParams))
 	}
 
 	const handleDeletion = () => {
@@ -44,37 +42,35 @@ const Blog = ({ blog }) => {
 		}
 	}
 
+	if (!blog) {
+		return <p>loading...</p>
+	}
+
 	return (
-		<div className='blog' style={blogStyle}>
-			<span className='blog-title'>
-				{blog.title} {blog.author}
-				<button onClick={toggleBlogDetails}>{showBlogDetails ? 'hide' : 'show'}</button>
-			</span>
-			<div
-				className='blog-details'
-				style={{ 'display': showBlogDetails ? '' : 'none' }}
-			>
-				<div className='blog-detail'>
-					<a className='blog-url' href={blog.url}>{blog.url}</a>
-				</div>
-				<div className='blog-detail'>
-					<span className='blog-likes'>likes {blog.likes}
-						<button onClick={handleIncrementLikes}>like</button>
-					</span>
-				</div>
-				<div className='blog-detail'>
-					<p className='blog-user'>
-						{blog.user.name || blog.user.username}
-					</p>
-				</div>
-				<div className='blog-detail'>
-					{isBlogOwnedByUser(blog.user.username) &&
-						<button
-							id='blog-remove'
-							style={deleteButtonStyle}
-							onClick={handleDeletion}
-						>remove</button>}
-				</div>
+		<div
+			className='blog-details'
+		>
+			<h1 className='blog-title'>{blog.title}</h1>
+			<div className='blog-detail'>
+				<a className='blog-url' href={blog.url}>{blog.url}</a>
+			</div>
+			<div className='blog-detail'>
+				<span className='blog-likes'>likes {blog.likes}
+					<button onClick={handleIncrementLikes}>like</button>
+				</span>
+			</div>
+			<div className='blog-detail'>
+				<p className='blog-user'>
+					added by {blog.user.name || blog.user.username}
+				</p>
+			</div>
+			<div className='blog-detail'>
+				{isBlogOwnedByUser(blog.user.username) &&
+					<button
+						id='blog-remove'
+						style={deleteButtonStyle}
+						onClick={handleDeletion}
+					>remove</button>}
 			</div>
 		</div>
 	)

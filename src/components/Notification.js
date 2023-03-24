@@ -1,3 +1,4 @@
+import { Alert } from '@mui/material'
 import { useSelector } from 'react-redux'
 
 const Notification = () => {
@@ -9,9 +10,9 @@ const Notification = () => {
 	const { message, type } = notifications[lastElementIndex]
 
 	return (
-		<div className={`notif-${type}`}>
+		<Alert severity={type} sx={{ margin: '1rem 0' }}>
 			{message}
-		</div>
+		</Alert>
 	)
 }
 

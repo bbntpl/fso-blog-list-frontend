@@ -70,10 +70,10 @@ describe('template spec', () => {
 			})
 
 			it('likes a blog by user', () => {
-				cy.get('.blog').children().contains('title0 author0').as('blogDetail')
-				cy.get('@blogDetail').find('button').click()
+				cy.get('.blog').children().contains('title0 author0').as('blogLink')
+				cy.get('@blogLink').contains('a', '#').click()
 
-				cy.get('@blogDetail').parent()
+				cy.get('.blog-details')
 					.get('button').contains('like')
 					.click()
 
@@ -102,19 +102,26 @@ describe('template spec', () => {
 				})
 
 				it('deletes a blog owned by user', function () {
-					cy.get('.blog').children().contains('title3 author3').as('blogDetail')
-					cy.get('@blogDetail').find('button').click()
+					cy.get('.blog').children().contains('title3 author3').as('blogLink')
+					cy.get('@blogLink').contains('a', '#').click()
 
-					cy.get('@blogDetail').parent().contains('remove').click()
+					cy.get('.blog-details')
+						.get('button')
+						.contains('remove')
+						.click()
 
 					cy.contains('Successfully deleted title3 by author3')
 				})
 
 				it('prevents user from deleting unowned blog', function () {
-					cy.get('.blog').children().contains('title4 author4').as('blogDetail')
-					cy.get('@blogDetail').find('button').click()
+					cy.get('.blog').children().contains('title4 author4').as('blogLink')
+					cy.get('@blogLink').contains('a', '#').click()
 
-					cy.get('@blogDetail').parent().contains('remove').should('not.exist')
+					cy.get('.blog-details')
+						.get('button')
+						.contains('remove')
+						.click()
+						.should('not.exist')
 				})
 
 				it('sort blogs by highest to lowest likes', function () {

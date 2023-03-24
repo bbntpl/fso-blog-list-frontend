@@ -35,14 +35,13 @@ const remove = async (id) => {
 	return response.data;
 }
 
-const update = async (id, newObject) => {
+const update = async (id, newObject, optionalRoute = '') => {
 	const config = {
 		headers: {
 			Authorization: token
 		}
 	}
-
-	const url = `${baseUrl}/${id}`
+	const url = `${baseUrl}/${id}/${optionalRoute}`
 	const response = await axios.put(url, newObject, config);
 	return response.data;
 }

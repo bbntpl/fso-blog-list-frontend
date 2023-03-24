@@ -1,23 +1,53 @@
-import PropTypes from 'prop-types'
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { submitUserCredentials } from '../reducers/loggedUserSlice';
+import { notifyUser } from '../reducers/notificationSlice';
+import loginService from '../services/login';
 
-const Login = (props) => {
-	const {
-		username,
-		password,
-		loginHandlers
-	} = props;
-	const {
-		submitUserCredentials,
-		changeUsername,
-		changePassword
-	} = loginHandlers;
+import { Button, TextField } from '@mui/material';
+
+const Login = () => {
+	const dispatch = useDispatch()
+
+	const [username, setUsername] = useState('');
+	const [password, setPassword] = useState('');
+
+	const handleLogin = async (event) => {
+		event.preventDefault()
+		try {
+			const user = await loginService.login({
+				username,
+				password
+			})
+			dispatch(submitUserCredentials(user))
+			setUsername('');
+			setPassword('');
+		} catch (exception) {
+			dispatch(notifyUser(
+				exception.response.data.error || 'Wrong username of password'
+			));
+		}
+	}
+
+
+	const changeUsername = ({ target }) => {
+		const usernameInput = target.value
+		setUsername(usernameInput);
+	}
+
+	const changePassword = ({ target }) => {
+		const pwdInput = target.value
+		setPassword(pwdInput);
+	}
 
 	return (
 		<>
-			<form onSubmit={submitUserCredentials} id='login-form'>
+			<h1>Login to application</h1>
+			<form onSubmit={handleLogin} id='login-form'>
 				<div>
-					username
-					<input
+					<TextField
+						label="Username"
+						variant="outlined"
 						id='username-input'
 						type="text"
 						value={username}
@@ -26,8 +56,9 @@ const Login = (props) => {
 					/>
 				</div>
 				<div>
-					password
-					<input
+					<TextField
+						label="Password"
+						variant="outlined"
 						id='password-input'
 						type="password"
 						value={password}
@@ -35,16 +66,12 @@ const Login = (props) => {
 						onChange={changePassword}
 					/>
 				</div>
-				<button id='login-btn' type="submit">login</button>
+				<div id='login-button-wrapper'>
+					<Button variant='outlined' id='login-btn' type="submit">login</Button>
+				</div>
 			</form>
 		</>
 	)
-}
-
-Login.propTypes = {
-	loginHandlers: PropTypes.object.isRequired,
-	username: PropTypes.string.isRequired,
-	password: PropTypes.string.isRequired
 }
 
 export default Login;
